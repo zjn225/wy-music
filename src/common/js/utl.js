@@ -14,10 +14,9 @@ export function shuffle (arr) {
   return _arr
 }
 
-// 截流函数
+// 防抖函数
 export function debounce (func, delay) {
   let timer
-
   return function (...args) {
     if (timer) {
       clearTimeout(timer)

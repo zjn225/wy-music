@@ -1,127 +1,117 @@
 <template>
 <transition name="slide">
   <div class="user">
+    <!-- 返回键 -->
     <div class="back" @click="back">
       <i class="fa fa-angle-left"></i>
     </div>
+    <!-- tab栏，其实只是个更换currentIndex值的功能，真正切换列表的是下面用scroll然后v-if判断 -->
     <div class="switches-wrapper">
       <switches @switch="switchItem" :switches="switches" :currentIndex="currentIndex"></switches>
     </div>
+    <!-- 播放全部列 -->
     <div class="sequence-play" @click="sequence">
       <i class="iconfont icon-bofangicon"></i>
       <span class="text">播放全部</span>
       <span class="count">(共{{count}}首)</span>
     </div>
+    <!-- 歌单列表 -->
     <div class="list-wrapper" ref="listWrapper">
-      <!-- 我的收藏 -->
-      <!-- <scroll ref="favoriteList" class="list-scroll" :data="favoriteList" v-if="currentIndex === 0">
+      <scroll ref="favoriteList" class="list-scroll" :data="favoriteList" v-if="currentIndex === 0">
         <div class="list-inner">
           <song-list @select="selectSong" :songs="favoriteList"></song-list>
         </div>
-      </scroll> -->
-
-       <!-- 云端收藏 -->
-      <scroll ref="playList" class="list-scroll" v-if="currentIndex === 0 && cloudMusic.length!=0" :data="cloudMusic">
-        <div class="list-inner">
-          <!-- <song-list @select="selectSong"></song-list> -->
-        </div>
       </scroll>
-
-      <!-- 播放历史 -->
       <scroll ref="playList" class="list-scroll" v-if="currentIndex === 1" :data="playHistory">
         <div class="list-inner">
           <song-list @select="selectSong" :songs="playHistory"></song-list>
         </div>
       </scroll>
-     
     </div>
+    <!-- 提示 -->
     <div class="no-result-wrapper" v-show="noResult">
       <no-result :title="noResultDesc"></no-result>
     </div>
-
   </div>
 </transition>
 </template>
 
 <script>
-import Switches from "base/switches/switches";
-import { mapGetters, mapActions } from "vuex";
-import NoResult from "base/no-result/no-result";
-import Scroll from "base/scroll/scroll";
-import SongList from "base/song-list/song-list";
+import Switches from 'base/switches/switches'
+import {mapGetters, mapActions} from 'vuex'
+import NoResult from 'base/no-result/no-result'
+import Scroll from 'base/scroll/scroll'
+import SongList from 'base/song-list/song-list'
 // import {playlistMixin} from 'common/js/mixin'
-import Login from "base/login/login";
-import { MessageBox } from "mint-ui";
-
 export default {
-  data() {
+  data () {
     return {
       currentIndex: 0,
-      switches: [{ name: "云端收藏" }, { name: "最近播放" }],
-      cloudMusic: []
-    };
+      switches: [
+        {name: '我的收藏'},
+        {name: '最近播放'}
+      ]
+    }
   },
   computed: {
-    noResult() {
+    noResult () {
       if (this.currentIndex === 0) {
-        return !this.cloudMusic.length;
+        return !this.favoriteList.length
       } else {
-        return !this.playHistory.length;
+        return !this.playHistory.length
       }
     },
-    count() {
+    count () {
       if (this.currentIndex === 0) {
-        return this.cloudMusic.length;
+        return this.favoriteList.length
       } else {
-        return this.playHistory.length;
+        return this.playHistory.length
       }
     },
-    noResultDesc() {
+    // currentInde为空时的提示
+    noResultDesc () {
       if (this.currentIndex === 0) {
-        return "去寻找属于你自己最爱的MUSIC吧~";
+        return '去寻找属于你自己最爱的MUSIC吧~'
       } else {
-        return "你还没有听过歌呀~";
+        return '你还没有听过歌呀~'
       }
     },
-    ...mapGetters(["favoriteList", "playHistory"])
+    ...mapGetters([
+      'favoriteList',
+      'playHistory'
+    ])
   },
   methods: {
-    back() {
-      this.$router.back();
+    back () {
+      this.$router.back()
     },
-    switchItem(index) {
-      this.currentIndex = index;
+    switchItem (index) {
+      this.currentIndex = index
     },
-    selectSong(song) {
-      this.insertSong(song);
+    selectSong (song) {
+      this.insertSong(song)
     },
-    sequence() {
-      let list = this.currentIndex === 0 ? this.favoriteList : this.playHistory;
+    sequence () {
+      let list = this.currentIndex === 0 ? this.favoriteList : this.playHistory
       if (list.length === 0) {
-        return;
+        return
       }
       this.sequencePlay({
         list: list
-      });
+      })
     },
-    ...mapActions(["insertSong", "sequencePlay"])
-  },
-  mounted() {
-    if (this.cloudMusic.length === 0) {
-      MessageBox.confirm("未登录，是否登录").then(action => {
-        this.$router.push({ path: "/login" });
-      });
-    }
+    ...mapActions([
+      'insertSong',
+      'sequencePlay'
+    ])
   },
   components: {
     Switches,
     SongList,
     Scroll,
-    NoResult,
-    Login,
-    MessageBox
+    NoResult
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -134,12 +124,10 @@ export default {
   right: 0;
   z-index: 100;
   background: $color-background;
-  &.slide-enter-active,
-  &.slide-leave-active {
+  &.slide-enter-active, &.slide-leave-active {
     transition: all 0.3s;
   }
-  &.slide-enter,
-  &.slide-leave-to {
+  &.slide-enter, &.slide-leave-to {
     transform: translate3d(-50%, 0, 0);
     opacity: 0;
   }

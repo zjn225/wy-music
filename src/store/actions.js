@@ -11,12 +11,14 @@ function findIndex (list, song) {
   })
 }
 
+// 歌单列表点击歌曲
 export const selectPlay = function ({commit, state}, {list, index}) {
-  commit(types.SET_SEQUENCE_LIST, list)
+  commit(types.SET_SEQUENCE_LIST, list) //设置list
+
   // 如果播放模式为随机
   if (state.mode === playMode.random) {
     let randomList = shuffle(list)
-    commit(types.SET_PLAYLIST, randomList)
+    commit(types.SET_PLAYLIST, randomList)  //设置playlist为randomlist
     index = findIndex(randomList, list[index])
   } else {
     commit(types.SET_PLAYLIST, list)

@@ -1,4 +1,4 @@
-
+// Song类
 export default class Song {
   constructor ({id, mid, singer, name, album, duration, image, url, aliaName}) {
     this.id = id
@@ -12,6 +12,7 @@ export default class Song {
   }
 }
 
+// 格式化歌手名
 function singerName (arr) {
   let name = []
   name = arr.map((item) => {
@@ -34,6 +35,7 @@ export function createRecommendSong (music) {
   })
 }
 
+// 创建歌单列表
 export function createRecommendListSong (music) {
   return new Song({
     id: music.id,

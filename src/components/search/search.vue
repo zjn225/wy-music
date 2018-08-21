@@ -1,18 +1,21 @@
 <template>
   <transition name="search">
     <div class="search" ref="searchWrapper">
+      <!-- 打字框 -->
       <div class="search-box-wrapper">
         <i class="fa fa-angle-left" @click="back"></i>
         <search-box @query="onQueryChange" ref="searchBox"></search-box>
       </div>
       <scroll class="search-scroll-wrapper" ref="scroll" :pullup="pullup" @scrollToEnd="searchMore">
         <div ref="search">
+          <!-- 热门搜索 -->
           <div class="search-hots" v-show="!query">
             <p class="title">热门搜索</p>
             <span class="search-hots-item" v-for="item in hots" :key="item.id" @click="addQuery(item.first)">
               {{item.first}}
             </span>
           </div>
+          <!-- 搜索历史 -->
           <div class="shortcut-wrapper" v-show="!query">
             <div class="search-history" v-show="searchHistory.length">
               <h1 class="title">
@@ -24,11 +27,13 @@
               <search-list @select=addQuery @delete="deleteSearchHistory" :searches="searchHistory"></search-list>
             </div>
           </div>
+          <!-- 搜索结果栏 -->
           <div class="search-result">
             <suggest @select="saveSearch" @refresh="refresh" :query="query" ref="suggest"></suggest>
           </div>
         </div>
       </scroll>
+      <!-- 提示 -->
       <confirm ref="confirm" @confirm="clearSearchHistory" text="是否清空历史记录？" confirmBtnText="清空"></confirm>
       <router-view></router-view>
     </div>
@@ -78,6 +83,7 @@ export default {
     saveSearch () {
       this.saveSearchHistory(this.query)
     },
+    // 上拉刷新，加载更多
     searchMore () {
       this.$refs.suggest.searchMore()
     },

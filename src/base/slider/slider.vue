@@ -1,8 +1,10 @@
 <template>
   <div class="slider" ref="slider">
     <div class="slider-group" ref="sliderGroup">
+      <!-- 轮播图图片将在这里插入 -->
       <slot></slot>
     </div>
+    <!-- 圆点 -->
     <div class="dots">
       <!--很重要的写法。是否绑定active这个class取决于冒号后面的参数-->
       <span class="dot" v-for="(item, index) in dots"
@@ -40,7 +42,7 @@ export default {
   },
   mounted() {
     setTimeout(() => {
-      this._setSliderWidth();
+       this._setSliderWidth();
       this._initDots();
       this._initSlider();
       this._onScrollEnd();
@@ -55,27 +57,10 @@ export default {
     });
   },
   methods: {
-    _setSliderWidth() {
-      this.children = this.$refs.sliderGroup.children;
-      let width = 0;
-      let sliderWidth = this.$refs.slider.clientWidth;
-      for (let i = 0; i < this.children.length; i++) {
-        const child = this.children[i];
-        addClass(child, "slider-item");
-        child.style.width = sliderWidth + "px";
-        width += sliderWidth;
-      }
-
-      if (this.loop) {
-        width += 2 * sliderWidth;
-      }
-      this.$refs.sliderGroup.style.width = width + "px";
-    },
     _initSlider() {
       this.slider = new BScroll(this.$refs.slider, {
-        scrollX: true,
-        // scrollY: false,
-        momentum: false,
+        scrollX: true,  //滚动方向
+        momentum: false, //惯性
         snap: {
           loop: this.loop,
           threshold: 0.3,
@@ -88,6 +73,27 @@ export default {
       });
       this.slider.on("scrollEnd", this._onScrollEnd);
     },
+
+    _setSliderWidth() {
+      this.children = this.$refs.sliderGroup.children;
+      let width = 0;
+      let sliderWidth = this.$refs.sliderGroup.clientWidth;
+      for (let i = 0; i < this.children.length; i++) {
+        const child = this.children[i];
+        addClass(child, "slider-item"); //主要是设置左浮动
+        child.style.width = sliderWidth + "px";
+        width += sliderWidth;
+      }
+      if (this.loop) {
+        width += 2 * sliderWidth;
+      }
+      this.$refs.sliderGroup.style.width = width + "px";
+    },
+
+    _initDots() {
+      this.dots = new Array(this.children.length);
+    },
+
     _onScrollEnd() {
       let pageIndex = this.slider.getCurrentPage().pageX;
       this.currentPageIndex = pageIndex;
@@ -95,14 +101,12 @@ export default {
         this._play();
       }
     },
+
     _play() {
       clearTimeout(this.timer);
       this.timer = setTimeout(() => {
         this.slider.next();
       }, this.interval);
-    },
-    _initDots() {
-      this.dots = new Array(this.children.length);
     }
   },
   destroyed() {
@@ -121,7 +125,7 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     .slider-item {
-      float: left;
+      float: left; //轮播图原理
       box-sizing: border-box;
       overflow: hidden;
       text-align: center;
@@ -131,6 +135,7 @@ export default {
       }
     }
   }
+  // 小圆点采用绝对定位
   .dots {
     position: absolute;
     right: 0;

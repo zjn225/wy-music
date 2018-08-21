@@ -3,7 +3,6 @@ import {HOST} from 'common/js/config'
 
 export function getSong (id) {
   const url = HOST + `/music/url?id=${id}`
-  console.log('url',url);
   return axios.get(url)
 }
 

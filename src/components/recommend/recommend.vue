@@ -106,6 +106,7 @@ export default {
     },
     selectSong(item) {
       this.insertSong(item);
+      this.setFullScreen(true);
     },
     handlePlaylist(playlist) {
       const bottom = playlist.length > 0 ? "60px" : "";
@@ -184,7 +185,7 @@ export default {
   .recommend-content {
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: hidden; //滚动到下面时，要隐藏！很重要
     // 轮播图下的装饰层
     .decorate {
       z-index: -10;
@@ -215,6 +216,7 @@ export default {
         font-weight: bold;
         color: $color-text;
       }
+      //推荐歌单用的只是盒子布局
       .item {
         display: inline-block;
         position: relative;

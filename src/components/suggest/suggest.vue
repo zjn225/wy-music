@@ -1,5 +1,6 @@
 <template>
   <div class="suggest">
+    <!-- 建议列表 -->
     <div class="search-suggest" v-show="!searchShow && query && songs.length > 0">
       <p class="title" v-show="showSinger && showList">最佳匹配</p>
       <div @click="selectItem(suggest.artists[0])" class="search-suggest-item" v-if="suggest.artists && showSinger">
@@ -14,6 +15,7 @@
         </div>
       </div>
     </div>
+    <!-- 搜索结果列表 -->
     <ul class="suggest-list" ref="suggestList" v-show="!searchShow">
       <li @click="selectSong(item)" class="suggest-item" v-for="(item, index) in songs" :key="index">
         <div class="icon">
@@ -33,17 +35,17 @@
 </template>
 
 <script>
-import Loading from 'base/loading/loading'
-import Singer from 'common/js/singer'
-import {getSearchSongs, getSearchSuggest, getSongDetail} from 'api/search'
-import {createSearchSong} from 'common/js/song'
-import {mapMutations, mapActions} from 'vuex'
+import Loading from "base/loading/loading";
+import Singer from "common/js/singer";
+import { getSearchSongs, getSearchSuggest, getSongDetail } from "api/search";
+import { createSearchSong } from "common/js/song";
+import { mapMutations, mapActions } from "vuex";
 
 export default {
   props: {
     query: {
       type: String,
-      default: ''
+      default: ""
     },
     showSinger: {
       type: Boolean,
@@ -54,7 +56,7 @@ export default {
       default: true
     }
   },
-  data () {
+  data() {
     return {
       singer: {},
       songs: [],
@@ -63,123 +65,120 @@ export default {
       page: 0,
       update: true,
       haveMore: true
-    }
+    };
   },
-  computed: {
-  },
+  computed: {},
   methods: {
-    selectList (item) {
-      console.log('item', item)
-      const list = {}
-      list.name = item.name
-      list.id = item.id
-      list.picUrl = item.coverImgUrl
-      list.playCount = item.playCount
+    // 选择了歌单
+    selectList(item) {
+      console.log("item", item);
+      const list = {};
+      list.name = item.name;
+      list.id = item.id;
+      list.picUrl = item.coverImgUrl;
+      list.playCount = item.playCount;
       this.$router.push({
         path: `/search/list/${list.id}`
-      })
-      this.setMusicList(list)
-      this.$emit('select')
+      });
+      this.setMusicList(list);
+      this.$emit("select");
     },
-    selectItem (item) {
+    // 选择了歌手
+    selectItem(item) {
       const singer = new Singer({
         id: item.id,
         name: item.name,
         avatar: item.img1v1Url
-      })
+      });
       this.$router.push({
         path: `/search/singer/${singer.id}`
-      })
-      this.setSinger(singer)
-      this.$emit('select')
+      });
+      this.setSinger(singer);
+      this.$emit("select");
     },
-    selectSong (item) {
-      getSongDetail(item.id).then((res) => {
-        item.image = res.data.songs[0].al.picUrl
-        this.insertSong(item)
+    // 选择了歌曲
+    selectSong(item) {
+      getSongDetail(item.id).then(res => {
+        item.image = res.data.songs[0].al.picUrl;
+        this.insertSong(item);
         // console.log(item.image)
-      })
-      this.$emit('select')
+      });
+      this.$emit("select");
     },
-    // handlePlaylist (playlist) {
-    //   const bottom = playlist.length > 0 ? '90px' : ''
-    //   this.$refs.suggestList.style['margin-bottom'] = bottom
-    //   this.$emit('refresh')
-    // },
-    search () {
-      this.searchShow = false
-      this.haveMore = true
-      getSearchSongs(this.query, this.page).then((res) => {
+
+    search() {
+      this.searchShow = false;
+      this.haveMore = true;
+      getSearchSongs(this.query, this.page).then(res => {
         if (!res.data.result.songs) {
-          this.haveMore = false
-          return
+          this.haveMore = false;
+          return;
         }
-        let list = res.data.result.songs
-        let ret = []
-        list.forEach((item) => {
-          ret.push(createSearchSong(item))
-        })
-        this.songs = ret
-        this.$emit('refresh')
-      })
-      this.page += 30
-      getSearchSuggest(this.query).then((res) => {
-        this.suggest = res.data.result
-      })
+        let list = res.data.result.songs;
+        let ret = [];
+        list.forEach(item => {
+          ret.push(createSearchSong(item));
+        });
+        this.songs = ret;
+        this.$emit("refresh");
+      });
+      this.page += 30;
+      getSearchSuggest(this.query).then(res => {
+        this.suggest = res.data.result;
+      });
     },
-    searchMore () {
-      console.log('searchMore')
+    // 加载更多,通过page来决定，然后用concat和前面连接起来
+    searchMore() {
+      console.log("searchMore");
       if (!this.haveMore) {
-        return
+        return;
       }
       if (!this.songs.length) {
-        return
+        return;
       }
-      getSearchSongs(this.query, this.page).then((res) => {
-        let list = res.data.result.songs
+      getSearchSongs(this.query, this.page).then(res => {
+        let list = res.data.result.songs;
         if (!res.data.result.songs) {
-          this.haveMore = false
-          return
+          this.haveMore = false;
+          return;
         }
-        let ret = []
-        list.forEach((item) => {
-          ret.push(createSearchSong(item))
-        })
-        this.songs = this.songs.concat(ret)
-        this.$emit('refresh')
-        this.page += 30
-      })
+        let ret = [];
+        list.forEach(item => {
+          ret.push(createSearchSong(item));
+        });
+        this.songs = this.songs.concat(ret);
+        this.$emit("refresh");
+        this.page += 30;
+      });
     },
     ...mapMutations({
-      setSinger: 'SET_SINGER',
-      setMusicList: 'SET_MUSIC_LIST'
+      setSinger: "SET_SINGER",
+      setMusicList: "SET_MUSIC_LIST"
     }),
-    ...mapActions([
-      'insertSong'
-    ])
+    ...mapActions(["insertSong"])
   },
   watch: {
-    query (val) {
-      if (val === '') {
-        this.suggest = {}
-        this.songs = []
-        this.haveMore = false
-        return
+    // 输入关键字变化的时候触发serach()方法
+    query(val) {
+      if (val === "") {
+        this.suggest = {};
+        this.songs = [];
+        this.haveMore = false;
+        return;
       }
-      this.suggest = {}
-      this.songs = []
-      this.searchShow = true
-      this.page = 0
-      this.haveMore = true
-      this.search()
+      this.suggest = {};
+      this.songs = [];
+      this.searchShow = true;
+      this.page = 0;
+      this.haveMore = true;
+      this.search();
     },
-    songs (songs) {
-    }
+    songs(songs) {}
   },
   components: {
     Loading
   }
-}
+};
 </script>
 
 <style scoped lang="scss" >
@@ -243,7 +242,7 @@ export default {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      // padding-bottom: 20px
+        // padding-bottom: 20px
       }
       .singer {
         font-size: 12px;
@@ -267,7 +266,7 @@ export default {
       color: $color-text;
       overflow: hidden;
       .text {
-       @include no-wrap();
+        @include no-wrap();
       }
     }
   }
